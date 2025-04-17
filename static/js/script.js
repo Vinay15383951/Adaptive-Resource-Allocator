@@ -54,3 +54,43 @@ document.getElementById('stopBtn').addEventListener('click', () => {
             showAlert('Monitoring stopped.');
         });
 });
+
+document.getElementById('updateThresholdsBtn').addEventListener('click', () => {
+    const cpu = document.getElementById('cpuThreshold').value;
+    const memory = document.getElementById('memoryThreshold').value;
+
+    fetch(`/update_thresholds?cpu=${cpu}&memory=${memory}`)
+        .then(res => res.json())
+        .then(data => {
+            showAlert(data.message);
+        });
+});
+
+function showAlert(message) {
+    const alertBox = document.getElementById('alert-box');
+    alertBox.textContent = message;
+    alertBox.classList.remove('hidden');
+
+    setTimeout(() => {
+        alertBox.classList.add('hidden');
+    }, 4000);
+}
+
+// Dark mode toggle logic
+const toggle = document.getElementById('darkModeToggle');
+
+// Apply saved mode
+if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+    toggle.checked = true;
+}
+
+toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'disabled');
+    }
+});
