@@ -94,3 +94,52 @@ toggle.addEventListener('change', () => {
         localStorage.setItem('darkMode', 'disabled');
     }
 });
+
+// Whitelist
+function fetchWhitelist() {
+    fetch('/whitelist')
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('whitelistList');
+            list.innerHTML = '';
+            data.whitelist.forEach(name => {
+                const item = document.createElement('li');
+                item.textContent = name;
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = '❌';
+                removeBtn.className = 'remove-btn';
+                removeBtn.onclick = () => removeFromWhitelist(name);
+                item.appendChild(removeBtn);
+                list.appendChild(item);
+            });
+        });
+}
+
+function addToWhitelist() {
+    const name = document.getElementById('whitelistInput').value.trim();
+    if (!name) return;
+    fetch('/whitelist/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+    })
+        .then(res => res.json())
+        .then(data => {
+            showAlert(data.message);
+            fetchWhitelist();
+            document.getElementById('whitelistInput').value = '';
+        });
+}
+
+function removeFromWhitelist(name) {
+    fetch('/whitelist/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+    })
+        .then(res => res.json())
+        .then(data => {
+            showAlert(data.message);
+            fetchWhitelist();
+        });
+}
