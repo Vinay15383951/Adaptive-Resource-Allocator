@@ -37,3 +37,44 @@ class ResourceAllocator:
     def add_to_whitelist(self, name):
         self.whitelist.add(name.lower())
         logging.info(f"Added to whitelist: {name}")
+
+    def remove_from_whitelist(self, name):
+        self.whitelist.discard(name.lower())
+        logging.info(f"Removed from whitelist: {name}")
+
+    def get_whitelist(self):
+        return list(self.whitelist)
+
+    def adjust_resources(self):
+        self.get_process_info()
+        for pid, info in list(self.processes.items()):
+            try:
+                proc_name = info['name'].lower()
+                if proc_name in self.whitelist:
+                    logging.info(f"Skipped whitelisted process: {info['name']} (PID: {pid})")
+                    continue
+
+                proc = psutil.Process(pid)
+
+                if info['cpu'] > self.threshold_cpu or info['memory'] > self.threshold_memory:
+                    if proc.nice() != self.low_priority:
+                        proc.nice(self.low_priority)
+                        logging.info(f"Lowered priority: {info['name']} (PID: {pid}) | CPU: {info['cpu']}%, Memory: {info['memory']}%")
+                else:
+                    if proc.nice() != self.normal_priority:
+                        proc.nice(self.normal_priority)
+                        logging.info(f"Restored priority: {info['name']} (PID: {pid})")
+
+            except Exception as e:
+                logging.warning(f"Error adjusting {info['name']} (PID: {pid}): {e}")
+
+    def start_monitoring(self):
+        self.running = True
+        logging.info("Monitoring started.")
+        while self.running:
+            self.adjust_resources()
+            time.sleep(2)
+
+    def stop_monitoring(self):
+        self.running = False
+        logging.info("Monitoring stopped.")

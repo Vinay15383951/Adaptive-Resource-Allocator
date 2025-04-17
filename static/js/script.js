@@ -143,3 +143,82 @@ function removeFromWhitelist(name) {
             fetchWhitelist();
         });
 }
+// Charts
+const cpuChartCtx = document.getElementById('cpuChart').getContext('2d');
+const memoryChartCtx = document.getElementById('memoryChart').getContext('2d');
+
+let cpuChart = new Chart(cpuChartCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'CPU Usage (%)',
+            data: [],
+            backgroundColor: 'rgba(0,123,255,0.1)',
+            borderColor: '#007bff',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true, max: 100 }
+        }
+    }
+});
+
+let memoryChart = new Chart(memoryChartCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Memory Usage (%)',
+            data: [],
+            backgroundColor: 'rgba(40,167,69,0.1)',
+            borderColor: '#28a745',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true, max: 100 }
+        }
+    }
+});
+
+function updateCharts(cpu, memory) {
+    const time = new Date().toLocaleTimeString();
+
+    cpuChart.data.labels.push(time);
+    cpuChart.data.datasets[0].data.push(cpu);
+    if (cpuChart.data.labels.length > 10) {
+        cpuChart.data.labels.shift();
+        cpuChart.data.datasets[0].data.shift();
+    }
+    cpuChart.update();
+
+    memoryChart.data.labels.push(time);
+    memoryChart.data.datasets[0].data.push(memory);
+    if (memoryChart.data.labels.length > 10) {
+        memoryChart.data.labels.shift();
+        memoryChart.data.datasets[0].data.shift();
+    }
+    memoryChart.update();
+}
+
+// Initial Fetch
+fetchMetrics();
+fetchProcesses();
+fetchLogs();
+fetchWhitelist();
+
+// Auto refresh
+setInterval(() => {
+    fetchMetrics();
+    fetchProcesses();
+    fetchLogs();
+    fetchWhitelist();
+}, 3000);
