@@ -60,7 +60,7 @@ def get_logs():
     except Exception as e:
         return jsonify({"log": f"Error reading logs: {str(e)}"})
     
-    @app.route('/start')
+@app.route('/start')
 def start_monitoring():
     global monitoring_thread
     if not allocator.running:
