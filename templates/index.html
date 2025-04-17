@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adaptive Resource Allocator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <!-- Dark Mode Toggle -->
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider round"></span>
+            </label>
+            <span class="toggle-label">Dark Mode</span>
+        </div>
+
+        <h1>Adaptive Resource Allocator</h1>
+
+        <!-- Tabs -->
+        <input type="radio" name="tabs" id="tab1" checked>
+        <input type="radio" name="tabs" id="tab2">
+        <input type="radio" name="tabs" id="tab3">
+        <input type="radio" name="tabs" id="tab4">
+
+        <div class="tab-nav">
+            <label for="tab1">Dashboard</label>
+            <label for="tab2">Processes</label>
+            <label for="tab3">Activity Logs</label>
+            <label for="tab4">Whitelist</label>
+        </div>
+
+        <div class="content">
+            <!-- Dashboard -->
+            <div id="dashboard" class="tab-content">
+              <div class="dashboard-grid">
+                  <!-- Metrics Card -->
+                  <div class="card metric-card">
+                      <h3>System Usage</h3>
+                      <div class="metric">
+                          <label>CPU Usage:</label>
+                          <span id="cpuUsage">0%</span>
+                      </div>
+                      <div class="metric">
+                          <label>Memory Usage:</label>
+                          <span id="memoryUsage">0%</span>
+                      </div>
+                  </div>
+          
+                  
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
