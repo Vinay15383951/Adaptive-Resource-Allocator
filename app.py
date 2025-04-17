@@ -59,3 +59,51 @@ def get_logs():
             return jsonify({"log": "".join(lines)})
     except Exception as e:
         return jsonify({"log": f"Error reading logs: {str(e)}"})
+    
+    @app.route('/start')
+def start_monitoring():
+    global monitoring_thread
+    if not allocator.running:
+        monitoring_thread = threading.Thread(target=allocator.start_monitoring, daemon=True)
+        monitoring_thread.start()
+        return jsonify({"status": "Monitoring started"})
+    return jsonify({"status": "Already running"})
+
+@app.route('/stop')
+def stop_monitoring():
+    allocator.stop_monitoring()
+    return jsonify({"status": "Monitoring stopped"})
+
+@app.route('/update_thresholds')
+def update_thresholds():
+    cpu = request.args.get("cpu", type=int)
+    memory = request.args.get("memory", type=int)
+    if cpu is not None:
+        allocator.threshold_cpu = cpu
+    if memory is not None:
+        allocator.threshold_memory = memory
+    return jsonify({"message": f"Thresholds updated: CPU={allocator.threshold_cpu}%, Memory={allocator.threshold_memory}%"})
+
+# --- Whitelist Routes ---
+@app.route('/whitelist')
+def get_whitelist():
+    return jsonify({"whitelist": allocator.get_whitelist()})
+
+@app.route('/whitelist/add', methods=['POST'])
+def add_to_whitelist():
+    name = request.json.get("name", "").strip()
+    if name:
+        allocator.add_to_whitelist(name)
+        return jsonify({"message": f"{name} added to whitelist."})
+    return jsonify({"message": "Invalid process name."}), 400
+
+@app.route('/whitelist/remove', methods=['POST'])
+def remove_from_whitelist():
+    name = request.json.get("name", "").strip()
+    if name:
+        allocator.remove_from_whitelist(name)
+        return jsonify({"message": f"{name} removed from whitelist."})
+    return jsonify({"message": "Invalid process name."}), 400
+
+if __name__ == '__main__':
+    app.run(debug=True)
